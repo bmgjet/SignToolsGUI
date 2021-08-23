@@ -16,3 +16,4 @@ C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.csproj.CoreCompi
 C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.csproj.CopyComplete
 C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.exe
 C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.pdb
+C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.csprojAssemblyReference.cache

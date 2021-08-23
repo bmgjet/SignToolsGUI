@@ -40,15 +40,17 @@ namespace SignToolsGUI
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.SignType = new System.Windows.Forms.Label();
+            this.name = new System.Windows.Forms.Label();
+            this.RemoveImage = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.ImagePreview)).BeginInit();
             this.SuspendLayout();
             // 
             // ImagePreview
             // 
             this.ImagePreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ImagePreview.Location = new System.Drawing.Point(12, 129);
+            this.ImagePreview.Location = new System.Drawing.Point(15, 92);
             this.ImagePreview.Name = "ImagePreview";
-            this.ImagePreview.Size = new System.Drawing.Size(298, 151);
+            this.ImagePreview.Size = new System.Drawing.Size(620, 265);
             this.ImagePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.ImagePreview.TabIndex = 0;
             this.ImagePreview.TabStop = false;
@@ -56,9 +58,9 @@ namespace SignToolsGUI
             // AddImage
             // 
             this.AddImage.Enabled = false;
-            this.AddImage.Location = new System.Drawing.Point(210, 100);
+            this.AddImage.Location = new System.Drawing.Point(337, 44);
             this.AddImage.Name = "AddImage";
-            this.AddImage.Size = new System.Drawing.Size(100, 23);
+            this.AddImage.Size = new System.Drawing.Size(100, 25);
             this.AddImage.TabIndex = 1;
             this.AddImage.Text = "Add Image";
             this.AddImage.UseVisualStyleBackColor = true;
@@ -66,7 +68,7 @@ namespace SignToolsGUI
             // 
             // OpenMap
             // 
-            this.OpenMap.Location = new System.Drawing.Point(104, 45);
+            this.OpenMap.Location = new System.Drawing.Point(12, 44);
             this.OpenMap.Name = "OpenMap";
             this.OpenMap.Size = new System.Drawing.Size(100, 25);
             this.OpenMap.TabIndex = 2;
@@ -96,16 +98,16 @@ namespace SignToolsGUI
             this.Locations.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Locations.Enabled = false;
             this.Locations.FormattingEnabled = true;
-            this.Locations.Location = new System.Drawing.Point(12, 73);
+            this.Locations.Location = new System.Drawing.Point(337, 19);
             this.Locations.Name = "Locations";
-            this.Locations.Size = new System.Drawing.Size(298, 21);
+            this.Locations.Size = new System.Drawing.Size(206, 21);
             this.Locations.TabIndex = 5;
             this.Locations.SelectedIndexChanged += new System.EventHandler(this.Selection);
             // 
             // SaveMap
             // 
             this.SaveMap.Enabled = false;
-            this.SaveMap.Location = new System.Drawing.Point(210, 45);
+            this.SaveMap.Location = new System.Drawing.Point(118, 44);
             this.SaveMap.Name = "SaveMap";
             this.SaveMap.Size = new System.Drawing.Size(100, 25);
             this.SaveMap.TabIndex = 7;
@@ -116,7 +118,7 @@ namespace SignToolsGUI
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 57);
+            this.label2.Location = new System.Drawing.Point(334, 3);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(52, 13);
             this.label2.TabIndex = 8;
@@ -125,7 +127,7 @@ namespace SignToolsGUI
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 110);
+            this.label3.Location = new System.Drawing.Point(12, 76);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(31, 13);
             this.label3.TabIndex = 9;
@@ -134,16 +136,38 @@ namespace SignToolsGUI
             // SignType
             // 
             this.SignType.AutoSize = true;
-            this.SignType.Location = new System.Drawing.Point(46, 110);
+            this.SignType.Location = new System.Drawing.Point(58, 76);
             this.SignType.Name = "SignType";
             this.SignType.Size = new System.Drawing.Size(0, 13);
             this.SignType.TabIndex = 10;
+            this.SignType.Visible = false;
+            // 
+            // name
+            // 
+            this.name.AutoSize = true;
+            this.name.Location = new System.Drawing.Point(46, 76);
+            this.name.Name = "name";
+            this.name.Size = new System.Drawing.Size(0, 13);
+            this.name.TabIndex = 11;
+            // 
+            // RemoveImage
+            // 
+            this.RemoveImage.Enabled = false;
+            this.RemoveImage.Location = new System.Drawing.Point(443, 44);
+            this.RemoveImage.Name = "RemoveImage";
+            this.RemoveImage.Size = new System.Drawing.Size(100, 25);
+            this.RemoveImage.TabIndex = 12;
+            this.RemoveImage.Text = "Remove Image";
+            this.RemoveImage.UseVisualStyleBackColor = true;
+            this.RemoveImage.Click += new System.EventHandler(this.RemoveImage_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1056, 641);
+            this.Controls.Add(this.RemoveImage);
+            this.Controls.Add(this.name);
             this.Controls.Add(this.SignType);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -158,7 +182,7 @@ namespace SignToolsGUI
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1";
-            this.Text = "SignToolsGUI 001";
+            this.Text = "SignToolsGUI 002";
             ((System.ComponentModel.ISupportInitialize)(this.ImagePreview)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -177,6 +201,8 @@ namespace SignToolsGUI
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label SignType;
+        private System.Windows.Forms.Label name;
+        private System.Windows.Forms.Button RemoveImage;
     }
 }
 

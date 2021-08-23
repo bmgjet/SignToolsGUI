@@ -39,6 +39,27 @@ namespace SignToolsGUI
             {"550204242", new SignSize(128, 256)},
             {"1283107100", new SignSize(256, 128)},
         };
+        private Dictionary<string, string> _Names = new Dictionary<string, string>
+        {
+            {"4006597758", "spinner.wheel"},
+            {"3215377795",  "sign.pictureframe.landscape"},
+            {"3159642196",  "sign.pictureframe.tall"},
+            {"1960724311",  "sign.pictureframe.portrait"},
+            {"3725754530",  "sign.pictureframe.xxl"},
+            {"1957158128", "sign.pictureframe.xl"},
+            {"1447270506",  "sign.small.wood"},
+            {"3715545584",  "sign.medium.wood"},
+            {"3479792512",  "sign.large.wood"},
+            {"3618197174",  "sign.huge.wood"},
+            {"637495597",  "sign.hanging.banner.large"},
+            {"3188315846",  "sign.pole.banner.large"},
+            {"58270319",  "sign.post.single"},
+            {"4290170446",  "sign.post.double"},
+            {"120534793",  "sign.post.town"},
+            {"4057957010", "sign.post.town.roof"},
+            {"550204242",  "sign.hanging"},
+            {"1283107100",  "sign.hanging.ornate"},
+        };
         private class SignSize
         {
             public int Width;
@@ -111,6 +132,7 @@ namespace SignToolsGUI
             Locations.Enabled = false;
             AddImage.Enabled = false;
             ImagePreview.Enabled = false;
+            RemoveImage.Enabled = false;
         }
         private bool isSign(PrefabData sign)
         {
@@ -204,6 +226,7 @@ namespace SignToolsGUI
                     AddImage.Enabled = true;
                     ImagePreview.Enabled = true;
                     SignType.Enabled = true;
+                    RemoveImage.Enabled = true;
                 }
                 catch
                 {
@@ -217,6 +240,7 @@ namespace SignToolsGUI
         {
             string[] selected = Locations.GetItemText(Locations.SelectedItem).Split(')');
             SignType.Text = selected[1].Replace(" ", "");
+            name.Text = _Names[SignType.Text];
             Size size = new Size(_signSizes[SignType.Text].Width, _signSizes[SignType.Text].Height);
             ImagePreview.Size = size;
             if (ModdedSerializedImageData.ContainsKey(selected[0]+")"))
@@ -302,6 +326,13 @@ namespace SignToolsGUI
                 }
             }
             MessageBox.Show("Saved");
+        }
+
+        private void RemoveImage_Click(object sender, EventArgs e)
+        {
+            string[] selected = Locations.GetItemText(Locations.SelectedItem).Split(')');
+            ModdedSerializedImageData[selected[0] + ")"] = new byte[0];
+            ImagePreview.Image = null;
         }
     }
 }
