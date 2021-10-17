@@ -227,21 +227,25 @@ namespace SignToolsGUI
             // 
             // Import
             // 
+            this.Import.Enabled = false;
             this.Import.Location = new System.Drawing.Point(1600, 6);
             this.Import.Name = "Import";
             this.Import.Size = new System.Drawing.Size(245, 64);
             this.Import.TabIndex = 17;
             this.Import.Text = "Import Settings";
             this.Import.UseVisualStyleBackColor = true;
+            this.Import.Click += new System.EventHandler(this.Import_Click);
             // 
             // Export
             // 
+            this.Export.Enabled = false;
             this.Export.Location = new System.Drawing.Point(1600, 76);
             this.Export.Name = "Export";
             this.Export.Size = new System.Drawing.Size(245, 57);
             this.Export.TabIndex = 18;
             this.Export.Text = "Export Settings";
             this.Export.UseVisualStyleBackColor = true;
+            this.Export.Click += new System.EventHandler(this.Export_Click);
             // 
             // Form1
             // 
@@ -271,7 +275,7 @@ namespace SignToolsGUI
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1";
-            this.Text = "SignToolsGUI 003";
+            this.Text = "SignToolsGUI 004";
             ((System.ComponentModel.ISupportInitialize)(this.ImagePreview)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

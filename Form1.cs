@@ -22,10 +22,10 @@ namespace SignToolsGUI
         Dictionary<string, uint> SerializedSkinData = new Dictionary<string, uint>();
         Dictionary<string, uint> ModdedSerializedSkinData = new Dictionary<string, uint>();
         uint[] signids = { 1447270506, 4057957010, 120534793, 58270319, 4290170446, 3188315846, 3215377795, 1960724311, 3159642196, 3725754530, 1957158128, 637495597, 1283107100, 4006597758, 3715545584, 3479792512, 3618197174, 550204242 };
-        uint[] skinnableids = { 1844023509, 177343599, 3994459244, 4196580066, 3110378351, 2206646561, 2931042549, 159326486, 2245774897, 1560881570, 3647679950, 170207918, 202293038, 1343928398, 43442943, 201071098, 1418678061, 2662124780 };
+        uint[] skinnableids = { 1844023509, 177343599, 3994459244, 4196580066, 3110378351, 2206646561, 2931042549, 159326486, 2245774897, 1560881570, 3647679950, 170207918, 202293038, 1343928398, 43442943, 201071098, 1418678061, 2662124780, 2057881102, 2335812770, 2905007296 };
         private Dictionary<string, SignSize> _signSizes = new Dictionary<string, SignSize>
         {
-            {"4006597758", new SignSize(512, 512)},
+            {"4006597758", new SignSize(64, 64)},
             {"3215377795", new SignSize(256, 128)},
             {"3159642196", new SignSize(128, 512)},
             {"1960724311", new SignSize(128, 256)},
@@ -81,8 +81,10 @@ namespace SignToolsGUI
             {"43442943","Double.WoodDoor" },
             {"201071098","Double.ArmourDoor" },
             {"1418678061","Double.MetalDoor" },
-            {"2662124780","Table" }
-
+            {"2662124780","Table" },
+            {"2057881102","Barricade.Concrete" },
+            {"2335812770","Barricade.Sandbags" },
+            {"2905007296","Waterpurifier" },
         };
         private class SignSize
         {
@@ -219,12 +221,25 @@ namespace SignToolsGUI
         }
         private void OpenMap_Click(object sender, EventArgs e)
         {
+            worldSerialization.Clear();
             Locations.Items.Clear();
             SerializedImageData.Clear();
             ModdedSerializedImageData.Clear();
             SkinLocations.Items.Clear();
             SerializedSkinData.Clear();
             ModdedSerializedSkinData.Clear();
+            ImagePreview.Image = null;
+            SaveMap.Enabled = false;
+            Locations.Enabled = false;
+            AddImage.Enabled = false;
+            ImagePreview.Enabled = false;
+            SignType.Enabled = false;
+            RemoveImage.Enabled = false;
+            SkinLocations.Enabled = false;
+            AddSkin.Enabled = false;
+            RemoveSkin.Enabled = false;
+            Export.Enabled = false;
+            Import.Enabled = false;
 
             OpenFileDialog openFileDialog1 = new OpenFileDialog
             {
@@ -308,7 +323,15 @@ namespace SignToolsGUI
                     }
                     else
                     {
+
                         MessageBox.Show("No signs or skinnable items are on this map");
+                        worldSerialization.Clear();
+                        Locations.Items.Clear();
+                        SerializedImageData.Clear();
+                        ModdedSerializedImageData.Clear();
+                        SkinLocations.Items.Clear();
+                        SerializedSkinData.Clear();
+                        ModdedSerializedSkinData.Clear();
                         return;
                     }
 
@@ -321,6 +344,8 @@ namespace SignToolsGUI
                     SkinLocations.Enabled = true;
                     AddSkin.Enabled = true;
                     RemoveSkin.Enabled = true;
+                    Export.Enabled = true;
+                    Import.Enabled = true;
                 }
                 catch
                 {
@@ -585,6 +610,155 @@ namespace SignToolsGUI
             string[] selected = SkinLocations.GetItemText(SkinLocations.SelectedItem).Split(')');
             ModdedSerializedSkinData[selected[0] + ")"] = 0;
             ImagePreview.Image = null;
+        }
+
+        private void Export_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Title = "Export Settings File";
+            saveFileDialog1.DefaultExt = "json";
+            saveFileDialog1.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
+            saveFileDialog1.FilterIndex = 1;
+            saveFileDialog1.RestoreDirectory = true;
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string Settings = "";
+                if (ModdedSerializedImageData.Count != 0)
+                {
+                    Settings += "<ModdedSerializedImageData>";
+                    foreach (KeyValuePair<string, byte[]> data in ModdedSerializedImageData)
+                    {
+                        Settings += "<sign><pos>" + data.Key + "</pos>" + "<data>" + Convert.ToBase64String(data.Value) + "</data></sign>";
+                    }
+                    Settings += "</ModdedSerializedImageData>";
+                }
+                if (ModdedSerializedSkinData.Count != 0)
+                {
+                    Settings += "<ModdedSerializedSkinData>";
+                    foreach (KeyValuePair<string, uint> data in ModdedSerializedSkinData)
+                    {
+                        Settings += "<skin><pos>" + data.Key + "</pos>" + "<data>" + Base64Encode(data.Value.ToString()) + "</data></skin>";
+                    }
+                    Settings += "</ModdedSerializedSkinData>";
+                }
+                File.WriteAllText(saveFileDialog1.FileName, Settings);
+                MessageBox.Show("Saved");
+            }
+
+        }
+
+        private void Import_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog
+            {
+                Title = "Import Settings File",
+
+                CheckFileExists = true,
+                CheckPathExists = true,
+
+                DefaultExt = "json",
+                Filter = "json files (*.json)|*.json|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+
+                ReadOnlyChecked = true,
+                ShowReadOnly = true
+            };
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string Settings = File.ReadAllText(openFileDialog1.FileName);
+                try
+                {
+                    string[] ModdedSerializedSkinData = Settings.Split(new string[] { "<ModdedSerializedSkinData>" }, StringSplitOptions.None)[1].Split(new string[] { "</ModdedSerializedSkinData>" }, StringSplitOptions.None);
+                    if (ModdedSerializedSkinData != null)
+                    {
+                        int missingskins = LoadSettings(ModdedSerializedSkinData[0], false);
+                        if (missingskins != 0)
+                        {
+                            MessageBox.Show("Missing " + missingskins.ToString() + " Skins");
+                        }
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    string[] ModdedSerializedImageData = Settings.Split(new string[] { "<ModdedSerializedImageData>" }, StringSplitOptions.None)[1].Split(new string[] { "</ModdedSerializedImageData>" }, StringSplitOptions.None);
+                    if (ModdedSerializedImageData != null)
+                    {
+                        int missingsigns = LoadSettings(ModdedSerializedImageData[0]);
+                        if (missingsigns != 0)
+                        {
+                            MessageBox.Show("Missing " + missingsigns.ToString() + " Signs");
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+        private int LoadSettings(string settings, bool sign = true)
+        {
+            int missing = 0;
+            if (sign)
+            {
+                Dictionary<string, byte[]> ImportedSigns = new Dictionary<string, byte[]>();
+                string[] SignInfo = settings.Split(new string[] { "<sign>" }, StringSplitOptions.None);
+                if (SignInfo.Length != 0)
+                {
+
+                    for (int i = 1; i < SignInfo.Length; i++)
+                    {
+                        string[] pos = SignInfo[i].Split(new string[] { "<pos>" }, StringSplitOptions.None)[1].Split(new string[] { "</pos>" }, StringSplitOptions.None);
+                        string[] data = SignInfo[i].Split(new string[] { "<data>" }, StringSplitOptions.None)[1].Split(new string[] { "</data>" }, StringSplitOptions.None);
+                        ImportedSigns.Add(pos[0], Convert.FromBase64String(data[0]));
+                    }
+                    if (ImportedSigns.Count != 0)
+                    {
+                        foreach (KeyValuePair<string, byte[]> importsign in ImportedSigns)
+                        {
+                            if (ModdedSerializedImageData.ContainsKey(importsign.Key))
+                            {
+                                ModdedSerializedImageData[importsign.Key] = importsign.Value;
+                            }
+                            else
+                            {
+                                missing++;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Dictionary<string, uint> ImportedSkins = new Dictionary<string, uint>();
+                string[] SkinInfo = settings.Split(new string[] { "<skin>" }, StringSplitOptions.None);
+                if (SkinInfo.Length != 0)
+                {
+                    for (int i = 1; i < SkinInfo.Length; i++)
+                    {
+
+                        string[] pos = SkinInfo[i].Split(new string[] { "<pos>" }, StringSplitOptions.None)[1].Split(new string[] { "</pos>" }, StringSplitOptions.None);
+                        string[] data = SkinInfo[i].Split(new string[] { "<data>" }, StringSplitOptions.None)[1].Split(new string[] { "</data>" }, StringSplitOptions.None);
+                        ImportedSkins.Add(pos[0], uint.Parse(Base64Decode(data[0])));
+                    }
+                    if (ImportedSkins.Count != 0)
+                    {
+                        foreach(KeyValuePair<string,uint> importskin in ImportedSkins)
+                        {
+                            if (ModdedSerializedSkinData.ContainsKey(importskin.Key))
+                            {
+                                ModdedSerializedSkinData[importskin.Key] = importskin.Value;
+                            }
+                            else
+                            {
+                                missing++;
+                            }
+                        }
+                    }
+                }
+            }
+            return missing;
         }
     }
 }
