@@ -37,8 +37,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="LZ4">
-      <HintPath>..\..\..\..\..\rust\RustServerFiles\RustDedicated_Data\Managed\LZ4.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>D:\rust\RustServerFiles\RustDedicated_Data\Managed\LZ4.dll</HintPath>
+    </Reference>
+    <Reference Include="LZ4pn">
+      <HintPath>D:\rust\RustServerFiles\RustDedicated_Data\Managed\LZ4pn.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Data">
       <HintPath>..\..\..\Desktop\Rust.Data.dll</HintPath>
@@ -65,6 +67,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Plugins.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Plugins.Designer.cs">
+      <DependentUpon>Plugins.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -73,6 +81,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Plugins.resx">
+      <DependentUpon>Plugins.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI.resx">
       <DependentUpon>GUI.cs</DependentUpon>
     </EmbeddedResource>
@@ -99,7 +110,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="blue_aB3_icon.ico" />
     <Content Include="st_1WN_icon.ico" />
     <EmbeddedResource Include="Facepunch.System.exe" />
     <EmbeddedResource Include="Rust.Data.dll" />

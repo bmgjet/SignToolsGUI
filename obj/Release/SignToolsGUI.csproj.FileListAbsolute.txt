@@ -8,3 +8,4 @@ C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.exe
 C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.pdb
 C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.csprojAssemblyReference.cache
 C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.GUI.resources
+C:\Users\bmg\source\repos\SignToolsGUI\obj\Release\SignToolsGUI.Plugins.resources

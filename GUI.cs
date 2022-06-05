@@ -9,6 +9,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace SignToolsGUI
@@ -17,15 +18,15 @@ namespace SignToolsGUI
     {
         WorldSerialization worldSerialization = new WorldSerialization();
         uint Version;
-        byte[] Frames = new byte[5];
         int SupportedFrames = 0;
-        Dictionary<string, List<byte[]>> SerializedImageData = new Dictionary<string, List<byte[]>>();
-        Dictionary<string, List<byte[]>> ModdedSerializedImageData = new Dictionary<string, List<byte[]>>();
+        public static Dictionary<string, List<byte[]>> SerializedImageData = new Dictionary<string, List<byte[]>>();
+        public static Dictionary<string, List<byte[]>> ModdedSerializedImageData = new Dictionary<string, List<byte[]>>();
         Dictionary<string, uint> SerializedSkinData = new Dictionary<string, uint>();
         Dictionary<string, uint> ModdedSerializedSkinData = new Dictionary<string, uint>();
+        public static Dictionary<string, string> PluginsData = new Dictionary<string, string>();
         uint[] signids = { 1447270506, 4057957010, 120534793, 58270319, 4290170446, 3188315846, 3215377795, 1960724311, 3159642196, 3725754530, 1957158128, 637495597, 1283107100, 4006597758, 3715545584, 3479792512, 3618197174, 550204242 };
         uint[] Neons = { 708840119, 3591916872, 3919686896, 2628005754, 3168507223 };
-        uint[] skinnableids = { 1844023509, 177343599, 3994459244, 4196580066, 3110378351, 2206646561, 2931042549, 159326486, 2245774897, 1560881570, 3647679950, 170207918, 202293038, 1343928398, 43442943, 201071098, 1418678061, 2662124780, 2057881102, 2335812770, 2905007296 };
+        uint[] skinnableids = { 1844023509, 177343599, 3994459244, 4196580066, 3110378351, 2206646561, 2931042549, 159326486, 2245774897, 1560881570, 3647679950, 170207918, 202293038, 1343928398, 43442943, 201071098, 1418678061, 2662124780, 2057881102, 2335812770, 2905007296, 3884356627 };
         private Dictionary<string, SignSize> _signSizes = new Dictionary<string, SignSize>
         {
             {"4006597758", new SignSize(64, 64)},
@@ -98,8 +99,10 @@ namespace SignToolsGUI
             {"3919686896","sign.neon.125x125"},
             {"2628005754","sign.neon.125x215"},
             {"3168507223","sign.neon.xl"},
+            {"3884356627","assets/spray.decal" }
         };
         public String Blanked = "iVBORw0KGgoAAAANSUhEUgAAANcAAAB9CAYAAAAx+vY9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB/SURBVHhe7cGBAAAAAMOg+VNf4QBVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8aqR4AAFsKyZjAAAAAElFTkSuQmCC";
+
 
         private class SignSize
         {
@@ -129,7 +132,6 @@ namespace SignToolsGUI
 
         void XMLDecode(string SerialData)
         {
-
             string[] DataParse = SerialData.Split(new string[] { "<position>" }, StringSplitOptions.None);
             foreach (string xmldata in DataParse)
             {
@@ -154,6 +156,20 @@ namespace SignToolsGUI
                     SerializedImageData.Add("(" + x + ", " + y + ", " + z + ")", ImageData);
                 }
                 catch { }
+            }
+        }
+        void XMLDecodePlugins(string PluginData)
+        {
+            string[] DataParse = PluginData.Split(new string[] { "<name>" }, StringSplitOptions.None);
+            foreach (string xmldata in DataParse)
+            {
+                if (xmldata.Contains("xml version")) continue;
+                string Name = xmldata.Split(new string[] { "</name>" }, StringSplitOptions.None)[0];
+                string Data = xmldata.Split(new string[] { "</data>" }, StringSplitOptions.None)[0].Split(new string[] { "<data>" }, StringSplitOptions.None)[1];
+                if (!PluginsData.ContainsKey(Name))
+                {
+                    PluginsData.Add(Name, Base64Decode(Data));
+                }
             }
         }
         void XMLDecodeSkin(string SerialData)
@@ -197,12 +213,25 @@ namespace SignToolsGUI
                         SerialData += Blanked + "<frame>";
                     }
                 }
-
                 SerialData += "</texture>";
             }
             XMLData = XMLData + SerialData + "</SerializedImageData>";
             return XMLData;
         }
+
+        string XMLEncodePlugin()
+        {
+            string XMLData = @"<? xml version=""1.0""?><SerializedPluginData>";
+            string SerialData = "";
+            foreach (KeyValuePair<string, string> _plugins in PluginsData)
+            {
+                SerialData += "<name>" + _plugins.Key + "</name>" +
+                              "<data>" + Base64Encode(_plugins.Value) + "</data>";
+            }
+            XMLData += SerialData + "</SerializedPluginData>";
+            return XMLData;
+        }
+
         string XMLEncodeSkin()
         {
             string XMLData = @"<? xml version=""1.0""?><SerializedSkinData>";
@@ -258,8 +287,11 @@ namespace SignToolsGUI
             resizedImage.Save(ms, ImageFormat.Png);
             return ms.ToArray();
         }
+
+        public static bool OpenProcessing = false;
         private void OpenMap_Click(object sender, EventArgs e)
         {
+            PluginsData.Clear();
             worldSerialization.Clear();
             Locations.Items.Clear();
             SerializedImageData.Clear();
@@ -282,6 +314,7 @@ namespace SignToolsGUI
             Framenumber.Enabled = false;
             FrameUp.Enabled = false;
             Framedown.Enabled = false;
+            Plugins.Enabled = false;
 
             OpenFileDialog openFileDialog1 = new OpenFileDialog
             {
@@ -301,10 +334,9 @@ namespace SignToolsGUI
 
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-
                 mapdir.Text = openFileDialog1.FileName;
-                try
-                {
+               // try
+              //  {
                     worldSerialization.Load(mapdir.Text);
                     Version = worldSerialization.Version;
 
@@ -314,11 +346,27 @@ namespace SignToolsGUI
                         MapData mapdata = worldSerialization.world.maps[i];
                         if (mapdata.name == Base64Encode("SerializedImageData"))
                         {
-                            XMLDecode(System.Text.Encoding.ASCII.GetString(mapdata.data));
+                        try
+                        {
+                            XMLDecode(System.Text.Encoding.UTF8.GetString(mapdata.data));
+                        }
+                        catch { }
                         }
                         else if (mapdata.name == Base64Encode("SerializedSkinData"))
                         {
-                            XMLDecodeSkin(System.Text.Encoding.ASCII.GetString(mapdata.data));
+                        try
+                        {
+                            XMLDecodeSkin(System.Text.Encoding.UTF8.GetString(mapdata.data));
+                        }
+                        catch { }
+                        }
+                        else if (mapdata.name == Base64Encode("SerializedPluginData"))
+                        {
+                        try
+                        {
+                            XMLDecodePlugins(System.Text.Encoding.UTF8.GetString(mapdata.data));
+                        }
+                        catch { }
                         }
                     }
 
@@ -329,29 +377,50 @@ namespace SignToolsGUI
                         if (isSign(prefabdata))
                         {
                             string location = "(" + prefabdata.position.x.ToString("0.0") + ", " + prefabdata.position.y.ToString("0.0") + ", " + prefabdata.position.z.ToString("0.0") + ")";
-                            Locations.Items.Add(location + " " + prefabdata.id.ToString());
-
+                            if (location.Contains("NaN") || location.Contains("0.0, 0.0, 0.0"))
+                            {
+                                continue;
+                            }
                             if (SerializedImageData.ContainsKey(location))
                             {
-                                ModdedSerializedImageData.Add(location, SerializedImageData[location]);
+                                if (!ModdedSerializedImageData.ContainsKey(location))
+                                {
+                                    ModdedSerializedImageData.Add(location, SerializedImageData[location]);
+                                    Locations.Items.Add(location + " " + prefabdata.id.ToString());
+                                }
                             }
                             else
                             {
                                 List<byte[]> blank = new List<byte[]>();
-                                ModdedSerializedImageData.Add(location, blank);
+                                if (!ModdedSerializedImageData.ContainsKey(location))
+                                {
+                                    ModdedSerializedImageData.Add(location, blank);
+                                    Locations.Items.Add(location + " " + prefabdata.id.ToString());
+                                }
                             }
                         }
                         else if (isSkinnable(prefabdata))
                         {
                             string location = "(" + prefabdata.position.x.ToString("0.0") + ", " + prefabdata.position.y.ToString("0.0") + ", " + prefabdata.position.z.ToString("0.0") + ")";
-                            SkinLocations.Items.Add(location + " " + prefabdata.id.ToString());
+                            if (location.Contains("NaN") || location.Contains("0.0, 0.0, 0.0"))
+                            {
+                                continue;
+                            }
                             if (SerializedSkinData.ContainsKey(location))
                             {
-                                ModdedSerializedSkinData.Add(location, SerializedSkinData[location]);
+                                if (!ModdedSerializedSkinData.ContainsKey(location))
+                                {
+                                    ModdedSerializedSkinData.Add(location, SerializedSkinData[location]);
+                                    SkinLocations.Items.Add(location + " " + prefabdata.id.ToString());
+                                }
                             }
                             else
                             {
-                                ModdedSerializedSkinData.Add(location, 0);
+                                if (!ModdedSerializedSkinData.ContainsKey(location))
+                                {
+                                    ModdedSerializedSkinData.Add(location, 0);
+                                    SkinLocations.Items.Add(location + " " + prefabdata.id.ToString());
+                                }
                             }
                         }
                     }
@@ -366,7 +435,6 @@ namespace SignToolsGUI
                     }
                     else
                     {
-
                         MessageBox.Show("No signs or skinnable items are on this map");
                         worldSerialization.Clear();
                         Locations.Items.Clear();
@@ -377,13 +445,13 @@ namespace SignToolsGUI
                         ModdedSerializedSkinData.Clear();
                         return;
                     }
-                }
-                catch
-                {
-                    MessageBox.Show("Failed to open map");
-                    DisableButtons();
-                    return;
-                }
+                //}
+                //catch
+                //{
+                //    MessageBox.Show("Failed to open map");
+                //    DisableButtons();
+                //    return;
+                //}
                 SaveMap.Enabled = true;
                 Locations.Enabled = true;
                 AddImage.Enabled = true;
@@ -397,61 +465,75 @@ namespace SignToolsGUI
                 Import.Enabled = true;
                 FrameUp.Enabled = true;
                 Framedown.Enabled = true;
+                Plugins.Enabled = true;
+
+                SignPosLable.Text = "Sign Positions: " + Locations.Items.Count.ToString();
+                SkinPosLabel.Text = "Skin Positions: " + SkinLocations.Items.Count.ToString();
             }
         }
 
         private void Selection(object sender, EventArgs e)
         {
-            string[] selected = Locations.GetItemText(Locations.SelectedItem).Split(')');
-            SignType.Text = selected[1].Replace(" ", "");
-            if (SignType.Text == "3591916872")
+            try
             {
-                SupportedFrames = 2;
-                Framenumber.Text = "0";
-                Framenumber.Enabled = true;
-                FrameUp.Enabled = true;
-                Framedown.Enabled = true;
-            }
-            else if (SignType.Text == "708840119")
-            {
-                SupportedFrames = 4;
-                Framenumber.Text = "0";
-                Framenumber.Enabled = true;
-                FrameUp.Enabled = true;
-                Framedown.Enabled = true;
-            }
-            else
-            {
-                SupportedFrames = 0;
-                Framenumber.Text = "0";
-                Framenumber.Enabled = false;
-                FrameUp.Enabled = false;
-                Framedown.Enabled = false;
-            }
-            name.Text = _Names[SignType.Text];
-            Size size = new Size(_signSizes[SignType.Text].Width, _signSizes[SignType.Text].Height);
-            ImagePreview.Size = size;
-            if (ModdedSerializedImageData.ContainsKey(selected[0] + ")"))
-            {
-                if (ModdedSerializedImageData[selected[0] + ")"].Count != 0)
+                string[] selected = Locations.GetItemText(Locations.SelectedItem).Split(')');
+                SignType.Text = selected[1].Replace(" ", "");
+                if (SignType.Text == "3591916872")
                 {
-                    ImagePreview.Image = ByteToImage(ModdedSerializedImageData[selected[0] + ")"][int.Parse(Framenumber.Text)]);
+                    SupportedFrames = 2;
+                    Framenumber.Text = "0";
+                    Framenumber.Enabled = true;
+                    FrameUp.Enabled = true;
+                    Framedown.Enabled = true;
+                }
+                else if (SignType.Text == "708840119")
+                {
+                    SupportedFrames = 4;
+                    Framenumber.Text = "0";
+                    Framenumber.Enabled = true;
+                    FrameUp.Enabled = true;
+                    Framedown.Enabled = true;
                 }
                 else
                 {
-                    ImagePreview.Image = null;
+                    SupportedFrames = 0;
+                    Framenumber.Text = "0";
+                    Framenumber.Enabled = false;
+                    FrameUp.Enabled = false;
+                    Framedown.Enabled = false;
+                }
+                name.Text = _Names[SignType.Text];
+                Size size = new Size(_signSizes[SignType.Text].Width, _signSizes[SignType.Text].Height);
+                ImagePreview.Size = size;
+                if (ModdedSerializedImageData.ContainsKey(selected[0] + ")"))
+                {
+                    if (ModdedSerializedImageData[selected[0] + ")"].Count != 0)
+                    {
+                        ImagePreview.Image = ByteToImage(ModdedSerializedImageData[selected[0] + ")"][int.Parse(Framenumber.Text)]);
+                    }
+                    else
+                    {
+                        ImagePreview.Image = null;
+                    }
                 }
             }
+            catch
+            { }
         }
         private void Selection2(object sender, EventArgs e)
         {
+
             Framenumber.Enabled = false;
             FrameUp.Enabled = false;
             Framedown.Enabled = false;
             Framenumber.Text = "0";
             string[] selected = SkinLocations.GetItemText(SkinLocations.SelectedItem).Split(')');
-            SignType.Text = selected[1].Replace(" ", "");
-            name.Text = _Names[SignType.Text];
+            try
+            {
+                SignType.Text = selected[1].Replace(" ", "");
+                name.Text = _Names[SignType.Text];
+            }
+            catch { return; }
             Size size = new Size(1024, 512);
             ImagePreview.Size = size;
             try
@@ -555,7 +637,6 @@ namespace SignToolsGUI
             }
         }
 
-
         public static Bitmap ByteToImage(byte[] blob)
         {
             MemoryStream mStream = new MemoryStream();
@@ -588,7 +669,6 @@ namespace SignToolsGUI
             {
 
                 byte[] NewImage = ImageResize(File.ReadAllBytes(openFileDialog1.FileName), ImagePreview.Width, ImagePreview.Height);
-                string test = Convert.ToBase64String(NewImage);
                 string[] selected = Locations.GetItemText(Locations.SelectedItem).Split(')');
                 if (ModdedSerializedImageData.ContainsKey(selected[0] + ")"))
                 {
@@ -613,47 +693,85 @@ namespace SignToolsGUI
                 }
             }
         }
+        public static string XMLData;
+        public static string XMLDataSkin;
+        public static string XMLDataPlugins;
+        public static bool SaveProcessing = false;
 
         private void SaveMap_Click(object sender, EventArgs e)
         {
-            string XMLData = XMLEncode();
-            string XMLDataSkin = XMLEncodeSkin();
-            //Check if mapdata already has image data
-            MapData sd = worldSerialization.GetMap(Base64Encode("SerializedImageData"));
-            MapData ssd = worldSerialization.GetMap(Base64Encode("SerializedSkinData"));
-            if (sd == null)
+            //Thread this stuff as showing save file dialog
+            SaveProcessing = false;
+            new Thread(() =>
             {
-                worldSerialization.AddMap(Base64Encode("SerializedImageData"), Encoding.ASCII.GetBytes(XMLData));
-            }
-            else
+                SaveProcessing = true;
+                Thread.CurrentThread.IsBackground = true;
+                XMLData = XMLEncode();
+                XMLDataSkin = XMLEncodeSkin();
+                XMLDataPlugins = XMLEncodePlugin();
+                SaveProcessing = false;
+            }).Start();
+
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog
             {
-                sd.data = Encoding.ASCII.GetBytes(XMLData);
-            }
-            if (ssd == null)
+                Title = "Save Edited Map",
+                DefaultExt = ".map",
+                Filter = "map file (*.map)|*.map|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+            };
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                worldSerialization.AddMap(Base64Encode("SerializedSkinData"), Encoding.ASCII.GetBytes(XMLDataSkin));
-            }
-            else
-            {
-                ssd.data = Encoding.ASCII.GetBytes(XMLDataSkin);
-            }
-            string mapfile = mapdir.Text.Replace(".map",".Mod.map");
-            if (File.Exists(mapfile))
-            {
-                File.Delete(mapfile);
-            }
-            using (FileStream fileStream = new FileStream(mapfile, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-            {
-                using (BinaryWriter binaryWriter = new BinaryWriter(fileStream))
+                //Check if mapdata already has image data
+                MapData sd = worldSerialization.GetMap(Base64Encode("SerializedImageData"));
+                MapData ssd = worldSerialization.GetMap(Base64Encode("SerializedSkinData"));
+                MapData spd = worldSerialization.GetMap(Base64Encode("SerializedPluginData"));
+                while(SaveProcessing)
                 {
-                    binaryWriter.Write(Version);
-                    using (LZ4Stream stream = new LZ4Stream(fileStream, LZ4StreamMode.Compress))
+                    Thread.Sleep(1000);
+                }
+                if (sd == null)
+                {
+                    worldSerialization.AddMap(Base64Encode("SerializedImageData"),Encoding.UTF8.GetBytes(XMLData));
+                }
+                else
+                {
+                    sd.data = Encoding.UTF8.GetBytes(XMLData);
+                }
+                if (ssd == null)
+                {
+                    worldSerialization.AddMap(Base64Encode("SerializedSkinData"), Encoding.UTF8.GetBytes(XMLDataSkin));
+                }
+                else
+                {
+                    ssd.data = Encoding.UTF8.GetBytes(XMLDataSkin);
+                }
+                if (spd == null)
+                {
+                    worldSerialization.AddMap(Base64Encode("SerializedPluginData"), Encoding.UTF8.GetBytes(XMLDataPlugins));
+                }
+                else
+                {
+                    spd.data = Encoding.UTF8.GetBytes(XMLDataPlugins);
+                }
+                if (File.Exists(saveFileDialog1.FileName))
+                {
+                    File.Delete(saveFileDialog1.FileName);
+                }
+                using (FileStream fileStream = new FileStream(saveFileDialog1.FileName, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                    using (BinaryWriter binaryWriter = new BinaryWriter(fileStream))
                     {
-                        WorldData.Serialize(stream, worldSerialization.world);
+                        binaryWriter.Write(Version);
+                        using (LZ4Stream stream = new LZ4Stream(fileStream, LZ4StreamMode.Compress))
+                        {
+                            WorldData.Serialize(stream, worldSerialization.world);
+                        }
                     }
                 }
+                MessageBox.Show("Saved file","Saved");
             }
-            MessageBox.Show("Saved");
         }
 
         private void RemoveImage_Click(object sender, EventArgs e)
@@ -903,6 +1021,32 @@ namespace SignToolsGUI
         private void Framedown_Click(object sender, EventArgs e)
         {
             Framenumber.Text = (int.Parse(Framenumber.Text) - 1).ToString();
+        }
+
+        private void Plugins_Click(object sender, EventArgs e)
+        {
+            Plugins plugins = new SignToolsGUI.Plugins();
+            plugins.StartPosition = FormStartPosition.CenterScreen;
+            plugins.ShowDialog();
+        }
+
+        private void scaleup_Click(object sender, EventArgs e)
+        {
+            scaletxt.Text = (double.Parse(scaletxt.Text) + .25).ToString();
+        }
+
+        private void scaledown_Click(object sender, EventArgs e)
+        {
+            scaletxt.Text = (double.Parse(scaletxt.Text) - .25).ToString();
+            if(scaletxt.Text == "0.")
+            {
+                scaletxt.Text = "0.25";
+            }
+        }
+
+        private void GUI_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

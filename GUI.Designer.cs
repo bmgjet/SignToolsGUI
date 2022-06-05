@@ -37,13 +37,13 @@ namespace SignToolsGUI
             this.label1 = new System.Windows.Forms.Label();
             this.Locations = new System.Windows.Forms.ComboBox();
             this.SaveMap = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
+            this.SignPosLable = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.SignType = new System.Windows.Forms.Label();
             this.name = new System.Windows.Forms.Label();
             this.RemoveImage = new System.Windows.Forms.Button();
             this.RemoveSkin = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
+            this.SkinPosLabel = new System.Windows.Forms.Label();
             this.SkinLocations = new System.Windows.Forms.ComboBox();
             this.AddSkin = new System.Windows.Forms.Button();
             this.Import = new System.Windows.Forms.Button();
@@ -52,6 +52,11 @@ namespace SignToolsGUI
             this.framelabel = new System.Windows.Forms.Label();
             this.FrameUp = new System.Windows.Forms.Button();
             this.Framedown = new System.Windows.Forms.Button();
+            this.Plugins = new System.Windows.Forms.Button();
+            this.scaledown = new System.Windows.Forms.Button();
+            this.scaleup = new System.Windows.Forms.Button();
+            this.scalelabel = new System.Windows.Forms.Label();
+            this.scaletxt = new System.Windows.Forms.MaskedTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.ImagePreview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -69,7 +74,7 @@ namespace SignToolsGUI
             // AddImage
             // 
             this.AddImage.Enabled = false;
-            this.AddImage.Location = new System.Drawing.Point(685, 85);
+            this.AddImage.Location = new System.Drawing.Point(644, 85);
             this.AddImage.Margin = new System.Windows.Forms.Padding(6);
             this.AddImage.Name = "AddImage";
             this.AddImage.Size = new System.Drawing.Size(200, 48);
@@ -113,7 +118,7 @@ namespace SignToolsGUI
             this.Locations.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Locations.Enabled = false;
             this.Locations.FormattingEnabled = true;
-            this.Locations.Location = new System.Drawing.Point(685, 37);
+            this.Locations.Location = new System.Drawing.Point(644, 37);
             this.Locations.Margin = new System.Windows.Forms.Padding(6);
             this.Locations.Name = "Locations";
             this.Locations.Size = new System.Drawing.Size(408, 33);
@@ -132,15 +137,15 @@ namespace SignToolsGUI
             this.SaveMap.UseVisualStyleBackColor = true;
             this.SaveMap.Click += new System.EventHandler(this.SaveMap_Click);
             // 
-            // label2
+            // SignPosLable
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(679, 6);
-            this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(155, 25);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "Sign Positions:";
+            this.SignPosLable.AutoSize = true;
+            this.SignPosLable.Location = new System.Drawing.Point(638, 6);
+            this.SignPosLable.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.SignPosLable.Name = "SignPosLable";
+            this.SignPosLable.Size = new System.Drawing.Size(155, 25);
+            this.SignPosLable.TabIndex = 8;
+            this.SignPosLable.Text = "Sign Positions:";
             // 
             // label3
             // 
@@ -174,7 +179,7 @@ namespace SignToolsGUI
             // RemoveImage
             // 
             this.RemoveImage.Enabled = false;
-            this.RemoveImage.Location = new System.Drawing.Point(897, 85);
+            this.RemoveImage.Location = new System.Drawing.Point(856, 85);
             this.RemoveImage.Margin = new System.Windows.Forms.Padding(6);
             this.RemoveImage.Name = "RemoveImage";
             this.RemoveImage.Size = new System.Drawing.Size(200, 48);
@@ -186,7 +191,7 @@ namespace SignToolsGUI
             // RemoveSkin
             // 
             this.RemoveSkin.Enabled = false;
-            this.RemoveSkin.Location = new System.Drawing.Point(1555, 85);
+            this.RemoveSkin.Location = new System.Drawing.Point(1583, 85);
             this.RemoveSkin.Margin = new System.Windows.Forms.Padding(6);
             this.RemoveSkin.Name = "RemoveSkin";
             this.RemoveSkin.Size = new System.Drawing.Size(200, 48);
@@ -195,22 +200,22 @@ namespace SignToolsGUI
             this.RemoveSkin.UseVisualStyleBackColor = true;
             this.RemoveSkin.Click += new System.EventHandler(this.RemoveSkin_Click);
             // 
-            // label4
+            // SkinPosLabel
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(1337, 6);
-            this.label4.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(154, 25);
-            this.label4.TabIndex = 15;
-            this.label4.Text = "Skin Positions:";
+            this.SkinPosLabel.AutoSize = true;
+            this.SkinPosLabel.Location = new System.Drawing.Point(1365, 6);
+            this.SkinPosLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.SkinPosLabel.Name = "SkinPosLabel";
+            this.SkinPosLabel.Size = new System.Drawing.Size(154, 25);
+            this.SkinPosLabel.TabIndex = 15;
+            this.SkinPosLabel.Text = "Skin Positions:";
             // 
             // SkinLocations
             // 
             this.SkinLocations.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.SkinLocations.Enabled = false;
             this.SkinLocations.FormattingEnabled = true;
-            this.SkinLocations.Location = new System.Drawing.Point(1343, 37);
+            this.SkinLocations.Location = new System.Drawing.Point(1371, 37);
             this.SkinLocations.Margin = new System.Windows.Forms.Padding(6);
             this.SkinLocations.Name = "SkinLocations";
             this.SkinLocations.Size = new System.Drawing.Size(408, 33);
@@ -220,7 +225,7 @@ namespace SignToolsGUI
             // AddSkin
             // 
             this.AddSkin.Enabled = false;
-            this.AddSkin.Location = new System.Drawing.Point(1343, 85);
+            this.AddSkin.Location = new System.Drawing.Point(1371, 85);
             this.AddSkin.Margin = new System.Windows.Forms.Padding(6);
             this.AddSkin.Name = "AddSkin";
             this.AddSkin.Size = new System.Drawing.Size(200, 48);
@@ -254,10 +259,10 @@ namespace SignToolsGUI
             // Framenumber
             // 
             this.Framenumber.Enabled = false;
-            this.Framenumber.Location = new System.Drawing.Point(1167, 34);
+            this.Framenumber.Location = new System.Drawing.Point(1097, 39);
             this.Framenumber.Mask = "0";
             this.Framenumber.Name = "Framenumber";
-            this.Framenumber.Size = new System.Drawing.Size(113, 31);
+            this.Framenumber.Size = new System.Drawing.Size(88, 31);
             this.Framenumber.TabIndex = 19;
             this.Framenumber.Text = "0";
             this.Framenumber.TextChanged += new System.EventHandler(this.Framenumber_TextChanged);
@@ -265,7 +270,7 @@ namespace SignToolsGUI
             // framelabel
             // 
             this.framelabel.AutoSize = true;
-            this.framelabel.Location = new System.Drawing.Point(1162, 6);
+            this.framelabel.Location = new System.Drawing.Point(1092, 6);
             this.framelabel.Name = "framelabel";
             this.framelabel.Size = new System.Drawing.Size(79, 25);
             this.framelabel.TabIndex = 20;
@@ -274,9 +279,9 @@ namespace SignToolsGUI
             // FrameUp
             // 
             this.FrameUp.Enabled = false;
-            this.FrameUp.Location = new System.Drawing.Point(1167, 85);
+            this.FrameUp.Location = new System.Drawing.Point(1097, 85);
             this.FrameUp.Name = "FrameUp";
-            this.FrameUp.Size = new System.Drawing.Size(52, 38);
+            this.FrameUp.Size = new System.Drawing.Size(41, 38);
             this.FrameUp.TabIndex = 21;
             this.FrameUp.Text = "▲";
             this.FrameUp.UseVisualStyleBackColor = true;
@@ -285,19 +290,73 @@ namespace SignToolsGUI
             // Framedown
             // 
             this.Framedown.Enabled = false;
-            this.Framedown.Location = new System.Drawing.Point(1228, 85);
+            this.Framedown.Location = new System.Drawing.Point(1144, 85);
             this.Framedown.Name = "Framedown";
-            this.Framedown.Size = new System.Drawing.Size(52, 38);
+            this.Framedown.Size = new System.Drawing.Size(41, 38);
             this.Framedown.TabIndex = 22;
             this.Framedown.Text = "▼";
             this.Framedown.UseVisualStyleBackColor = true;
             this.Framedown.Click += new System.EventHandler(this.Framedown_Click);
+            // 
+            // Plugins
+            // 
+            this.Plugins.Enabled = false;
+            this.Plugins.Location = new System.Drawing.Point(445, 85);
+            this.Plugins.Name = "Plugins";
+            this.Plugins.Size = new System.Drawing.Size(171, 48);
+            this.Plugins.TabIndex = 23;
+            this.Plugins.Text = "Plugins";
+            this.Plugins.UseVisualStyleBackColor = true;
+            this.Plugins.Click += new System.EventHandler(this.Plugins_Click);
+            // 
+            // scaledown
+            // 
+            this.scaledown.Location = new System.Drawing.Point(1271, 85);
+            this.scaledown.Name = "scaledown";
+            this.scaledown.Size = new System.Drawing.Size(41, 38);
+            this.scaledown.TabIndex = 27;
+            this.scaledown.Text = "▼";
+            this.scaledown.UseVisualStyleBackColor = true;
+            this.scaledown.Click += new System.EventHandler(this.scaledown_Click);
+            // 
+            // scaleup
+            // 
+            this.scaleup.Location = new System.Drawing.Point(1224, 85);
+            this.scaleup.Name = "scaleup";
+            this.scaleup.Size = new System.Drawing.Size(41, 38);
+            this.scaleup.TabIndex = 26;
+            this.scaleup.Text = "▲";
+            this.scaleup.UseVisualStyleBackColor = true;
+            this.scaleup.Click += new System.EventHandler(this.scaleup_Click);
+            // 
+            // scalelabel
+            // 
+            this.scalelabel.AutoSize = true;
+            this.scalelabel.Location = new System.Drawing.Point(1219, 7);
+            this.scalelabel.Name = "scalelabel";
+            this.scalelabel.Size = new System.Drawing.Size(72, 25);
+            this.scalelabel.TabIndex = 25;
+            this.scalelabel.Text = "Scale:";
+            // 
+            // scaletxt
+            // 
+            this.scaletxt.Location = new System.Drawing.Point(1224, 39);
+            this.scaletxt.Mask = "0.00";
+            this.scaletxt.Name = "scaletxt";
+            this.scaletxt.Size = new System.Drawing.Size(88, 31);
+            this.scaletxt.TabIndex = 24;
+            this.scaletxt.Text = "100";
             // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2112, 1233);
+            this.Controls.Add(this.scaledown);
+            this.Controls.Add(this.scaleup);
+            this.Controls.Add(this.scalelabel);
+            this.Controls.Add(this.scaletxt);
+            this.Controls.Add(this.Plugins);
             this.Controls.Add(this.Framedown);
             this.Controls.Add(this.FrameUp);
             this.Controls.Add(this.framelabel);
@@ -305,14 +364,14 @@ namespace SignToolsGUI
             this.Controls.Add(this.Export);
             this.Controls.Add(this.Import);
             this.Controls.Add(this.RemoveSkin);
-            this.Controls.Add(this.label4);
+            this.Controls.Add(this.SkinPosLabel);
             this.Controls.Add(this.SkinLocations);
             this.Controls.Add(this.AddSkin);
             this.Controls.Add(this.RemoveImage);
             this.Controls.Add(this.name);
             this.Controls.Add(this.SignType);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.SignPosLable);
             this.Controls.Add(this.SaveMap);
             this.Controls.Add(this.Locations);
             this.Controls.Add(this.label1);
@@ -325,7 +384,8 @@ namespace SignToolsGUI
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "GUI";
-            this.Text = "SignToolsGUI 005";
+            this.Text = "SignToolsGUI 007";
+            this.Load += new System.EventHandler(this.GUI_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ImagePreview)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -341,13 +401,13 @@ namespace SignToolsGUI
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox Locations;
         private System.Windows.Forms.Button SaveMap;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label SignPosLable;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label SignType;
         private System.Windows.Forms.Label name;
         private System.Windows.Forms.Button RemoveImage;
         private System.Windows.Forms.Button RemoveSkin;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label SkinPosLabel;
         private System.Windows.Forms.ComboBox SkinLocations;
         private System.Windows.Forms.Button AddSkin;
         private System.Windows.Forms.Button Import;
@@ -356,6 +416,11 @@ namespace SignToolsGUI
         private System.Windows.Forms.Label framelabel;
         private System.Windows.Forms.Button FrameUp;
         private System.Windows.Forms.Button Framedown;
+        private System.Windows.Forms.Button Plugins;
+        private System.Windows.Forms.Button scaledown;
+        private System.Windows.Forms.Button scaleup;
+        private System.Windows.Forms.Label scalelabel;
+        private System.Windows.Forms.MaskedTextBox scaletxt;
     }
 }
 
